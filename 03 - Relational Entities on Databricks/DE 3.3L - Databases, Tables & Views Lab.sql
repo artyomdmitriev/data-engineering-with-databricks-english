@@ -77,9 +77,7 @@ FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN> ${da.db_name}
+CREATE DATABASE `${da.db_name}`
 
 -- COMMAND ----------
 
@@ -103,9 +101,7 @@ FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN> ${da.db_name}
+USE ${da.db_name}
 
 -- COMMAND ----------
 
@@ -128,9 +124,7 @@ FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN>
+CREATE TABLE weather_managed
 SELECT * 
 FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
@@ -157,9 +151,7 @@ FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN>
+CREATE TABLE weather_external
 LOCATION "${da.paths.working_dir}/lab/external"
 AS SELECT * 
 FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
@@ -248,9 +240,7 @@ DESCRIBE EXTENDED weather_external
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL_IN> ${da.db_name}
+DROP DATABASE ${da.db_name} CASCADE
 
 -- COMMAND ----------
 
@@ -322,9 +312,9 @@ USE ${da.db_name};
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL_IN>
+CREATE TABLE weather_managed
+SELECT * 
+FROM parquet.`${DA.paths.datasets}/weather/StationData-parquet`
 
 -- COMMAND ----------
 
@@ -364,9 +354,7 @@ USE ${da.db_name};
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN>
+CREATE VIEW celsius
 AS (SELECT *
   FROM weather_managed
   WHERE UNIT = "C")
@@ -392,9 +380,7 @@ AS (SELECT *
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN>
+CREATE TEMPORARY VIEW celsius_temp
 AS (SELECT *
   FROM weather_managed
   WHERE UNIT = "C")
@@ -420,9 +406,7 @@ AS (SELECT *
 
 -- COMMAND ----------
 
--- TODO
-
-<FILL-IN>
+CREATE GLOBAL TEMPORARY VIEW celsius_global
 AS (SELECT *
   FROM weather_managed
   WHERE UNIT = "C")
