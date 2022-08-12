@@ -33,9 +33,8 @@
 
 -- COMMAND ----------
 
--- TODO
-CREATE <FILL-IN>
-AS SELECT <FILL-IN>
+CREATE STREAMING LIVE TABLE recordings_bronze
+AS SELECT *, current_timestamp AS receipt_time, input_file_name() AS source_file
   FROM cloud_files("${source}", "json", map("cloudFiles.schemaHints", "time DOUBLE"))
 
 -- COMMAND ----------
@@ -58,10 +57,9 @@ AS SELECT <FILL-IN>
 
 -- COMMAND ----------
 
--- TODO
-CREATE <FILL-IN> pii
+CREATE LIVE TABLE pii
 AS SELECT *
-  FROM cloud_files("${datasets_path}/healthcare/patient", "csv", map(<FILL-IN>))
+  FROM cloud_files("${datasets_path}/healthcare/patient", "csv", map("header", "true", "cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
@@ -86,16 +84,15 @@ AS SELECT *
 
 -- COMMAND ----------
 
--- TODO
 CREATE OR REFRESH STREAMING LIVE TABLE recordings_enriched
-  (<FILL-IN add a constraint to drop records when heartrate ! > 0>)
+  (CONSTRAINT heartrate_not_more_than_zero EXPECT (heartrate > 0) ON VIOLATION DROP ROW)
 AS SELECT 
-  CAST(<FILL-IN>) device_id, 
-  <FILL-IN mrn>, 
-  <FILL-IN heartrate>, 
+  CAST(device_id AS numeric) device_id, 
+  mrn, 
+  heartrate, 
   CAST(FROM_UNIXTIME(DOUBLE(time), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time 
-  FROM STREAM(live.recordings_bronze)
-  <FILL-IN specify source and perform inner join with pii on mrn>
+  FROM STREAM(live.recordings_bronze) rec
+  INNER JOIN pii ON rec.mrn = pii.mrn
 
 -- COMMAND ----------
 
@@ -115,10 +112,15 @@ AS SELECT
 
 -- COMMAND ----------
 
--- TODO
-CREATE <FILL-IN> daily_patient_avg
-  COMMENT <FILL-IN insert comment here>
-AS SELECT <FILL-IN>
+CREATE LIVE TABLE daily_patient_avg
+  COMMENT "aggregates recordings by mrn, name, and date"
+AS SELECT
+mrn,
+name,
+AVG(heartrate) AS avg_heartrate,
+DATE(time) as date
+FROM recordings_enriched
+GROUP BY mrn, name, DATE(time)
 
 -- COMMAND ----------
 
